@@ -128,3 +128,22 @@ app.post('/api/posts', (req, res) => {
     }
   );
 });
+
+// PUT update a blog post
+app.put('/api/posts/:id', (req, res) => {
+  const { title, content, author } = req.body;
+  const { id } = req.params;
+
+  db.run(
+    `UPDATE posts
+     SET title = ?, content = ?, author = ?, updated_at = CURRENT_TIMESTAMP
+     WHERE id = ?`,
+    [title, content, author, id],
+    function (err) {
+      if (err || this.changes === 0) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+      res.json({ message: 'Post updated successfully' });
+    }
+  );
+});
