@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog MVC - RESTful API Demo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">📝 Blog MVC</h1>
+                <p class="app-subtitle">RESTful API with JavaScript MVC Architecture</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Form Section -->
+            <section class="form-section">
+                <div class="section-header">
+                    <h2>Create or Edit Posts</h2>
+                    <p class="section-description">Write your thoughts and share them with the world</p>
+                </div>
+                <div id="form-container" class="form-container">
+                    <!-- Form will be rendered here by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Posts Section -->
+            <section class="posts-section">
+                <div class="section-header">
+                    <h2>Blog Posts</h2>
+                    <p class="section-description">All your blog posts in one place</p>
+                </div>
+                
+                <!-- Loading Indicator -->
+                <div id="loading-indicator" class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    <p>Loading posts...</p>
+                </div>
+
+                <!-- Error Container -->
+                <div id="error-container" class="error-container" style="display: none;">
+                    <!-- Error messages will be displayed here -->
+                </div>
+
+                <!-- Posts Container -->
+                <div id="posts-container" class="posts-container">
+                    <!-- Posts will be rendered here by JavaScript -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <p>&copy; 2024 Blog MVC Demo - Educational Project</p>
+                <p class="tech-stack">Built with: JavaScript, Express.js, RESTful API, MVC Pattern</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Educational Modal (Hidden by default) -->
+    <div id="educational-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>MVC Architecture Explained</h2>
+            <div id="modal-body">
+                <!-- Educational content will be inserted here -->
+            </div>
+            <button id="close-modal" class="btn btn-primary">Close</button>
+        </div>
+    </div>
+
+    <!-- Edit Modal (Hidden by default) -->
+    <div id="edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" id="close-edit-modal">&times;</span>
+            <h2>Edit Post</h2>
+            <div id="edit-form-container">
+                <!-- Edit form will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Educational Button -->
+    <button id="educational-btn" class="educational-btn" title="Learn about MVC Architecture">
+        📚 MVC
+    </button>
+
+    <!-- Scripts -->
+    <script src="js/model.js"></script>
+    <script src="js/view.js"></script>
+    <script src="js/controller.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
