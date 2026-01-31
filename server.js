@@ -101,3 +101,30 @@ app.get('/api/posts', async (req, res) => {
     }
   });
 });
+
+// POST create a new blog post
+app.post('/api/posts', (req, res) => {
+  const { title, content, author } = req.body;
+
+  if (!title || !content) {
+    return res.status(400).json({ error: 'Title and content are required' });
+  }
+
+  db.run(
+    `INSERT INTO posts (title, content, author, created_at, updated_at)
+     VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+    [title, content, author || 'Anonymous'],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to create post' });
+      }
+
+      res.status(201).json({
+        id: this.lastID,
+        title,
+        content,
+        author: author || 'Anonymous'
+      });
+    }
+  );
+});
