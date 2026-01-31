@@ -78,3 +78,26 @@ function initializeDatabase() {
 
 // DB Instance
 let db;
+
+// Get all the posts
+app.get('/api/posts', async (req, res) => {
+  console.log('📖 GET /api/posts - Fetching all blog posts');
+  
+  db.all('SELECT * FROM posts ORDER BY created_at DESC', (err, rows) => {
+    if (err) {
+      console.error('Error fetching posts:', err);
+      res.status(500).json({ error: 'Failed to fetch posts' });
+    } else {
+      // Convert SQLite format to match original JSON format
+      const posts = rows.map(row => ({
+        id: row.id,
+        title: row.title,
+        content: row.content,
+        author: row.author,
+        createdAt: new Date(row.created_at).toISOString(),
+        updatedAt: new Date(row.updated_at).toISOString()
+      }));
+      res.json(posts);
+    }
+  });
+});
