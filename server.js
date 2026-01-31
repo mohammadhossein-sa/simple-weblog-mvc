@@ -147,3 +147,15 @@ app.put('/api/posts/:id', (req, res) => {
     }
   );
 });
+
+// DELETE a blog post
+app.delete('/api/posts/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.run('DELETE FROM posts WHERE id = ?', id, function (err) {
+    if (err || this.changes === 0) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    res.json({ message: 'Post deleted successfully' });
+  });
+});
