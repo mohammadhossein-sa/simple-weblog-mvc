@@ -4,7 +4,6 @@ class BlogController {
     this.view = view;
     this.isInitialized = false;
 
-    // Bind methods
     this.initialize = this.initialize.bind(this);
     this.handlePostCreate = this.handlePostCreate.bind(this);
     this.handlePostUpdate = this.handlePostUpdate.bind(this);
@@ -57,13 +56,18 @@ class BlogController {
     await this.model.loadPosts();
   }
 
+  async handlePostCreate(postData) {
+    await this.model.createPost(postData);
+    this.view.showSuccess('Post created successfully');
+  }
+
   handleViewInitialized() {}
 
   handlePostsLoaded(posts) {
     this.view.renderPosts(posts);
   }
 
-  handlePostCreated(newPost) {
+  handlePostCreated() {
     this.view.clearForm();
     this.loadPosts();
   }
