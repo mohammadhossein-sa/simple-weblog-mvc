@@ -6,7 +6,6 @@ class BlogModel {
     this.isLoading = false;
   }
 
-  // Observer pattern implementation
   addObserver(observer) {
     this.observers.push(observer);
   }
@@ -21,6 +20,12 @@ class BlogModel {
         observer[event](data);
       }
     });
+  }
+
+
+  setLoading(loading) {
+    this.isLoading = loading;
+    this.notifyObservers('onLoadingChange', loading);
   }
 }
 
