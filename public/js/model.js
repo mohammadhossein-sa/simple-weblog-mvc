@@ -153,6 +153,17 @@ class BlogModel {
   getPostById(postId) {
     return this.posts.find(post => post.id === postId);
   }
+
+  formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
 }
 
 window.BlogModel = BlogModel;
