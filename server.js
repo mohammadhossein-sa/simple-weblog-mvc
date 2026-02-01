@@ -1,18 +1,16 @@
 const express = require('express');
 const cors = require('cors');
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const app = express();
 const PORT = 3001;
+const DB_PATH = path.join(__dirname, 'data', 'blog.db');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
 
 function initializeDatabase() {
   return new Promise((resolve, reject) => {
