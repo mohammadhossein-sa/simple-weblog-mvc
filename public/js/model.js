@@ -48,6 +48,20 @@ class BlogModel {
       this.notifyObservers('onLoadingEnd');
     }
   }
+
+  validatePostData(postData) {
+    const errors = [];
+
+    if (!postData.title || postData.title.trim().length < 3) {
+      errors.push('Title must be at least 3 characters long');
+    }
+
+    if (!postData.content || postData.content.trim().length < 10) {
+      errors.push('Content must be at least 10 characters long');
+    }
+
+    return errors;
+  }
 }
 
 window.BlogModel = BlogModel;
