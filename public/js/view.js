@@ -9,6 +9,7 @@ class BlogView {
     this.editModal = null;
     this.editFormContainer = null;
 
+    // Bind methods to maintain context
     this.renderPosts = this.renderPosts.bind(this);
     this.renderPostForm = this.renderPostForm.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -21,8 +22,10 @@ class BlogView {
     this.showEditModal = this.showEditModal.bind(this);
     this.hideEditModal = this.hideEditModal.bind(this);
     this.renderEditForm = this.renderEditForm.bind(this);
+    this.handleEditSubmit = this.handleEditSubmit.bind(this);
   }
 
+  // Observer pattern implementation
   addObserver(observer) {
     this.observers.push(observer);
   }
@@ -39,6 +42,7 @@ class BlogView {
     });
   }
 
+  // Initialization
   initialize() {
     this.setupDOMElements();
     this.renderPostForm();
@@ -65,6 +69,7 @@ class BlogView {
     }
   }
 
+  // Rendering methods
   renderPosts(posts) {
     if (!posts || posts.length === 0) {
       this.postsContainer.innerHTML = `
@@ -109,64 +114,34 @@ class BlogView {
     `;
   }
 
+  // Event handling
   attachPostEventListeners() {
     this.postsContainer.addEventListener('click', (e) => {
-      const actionBtn = e.target.closest('[data-action]');
-      if (!actionBtn) return;
+      const action = e.target.closest('[data-action]');
+      if (!action) return;
 
-      const postId = Number(actionBtn.dataset.postId);
-      const action = actionBtn.dataset.action;
+      const postId = Number(action.dataset.postId);
 
-      if (action === 'edit') {
+      if (action.dataset.action === 'edit') {
         this.handleEdit(postId);
       }
 
-      if (action === 'delete') {
+      if (action.dataset.action === 'delete') {
         this.handleDelete(postId);
       }
     });
   }
 
-  renderPostForm() {
-    this.formContainer.innerHTML = `
-      <form id="post-form" class="post-form">
-        <div class="form-group">
-          <label for="title">Title</label>
-          <input type="text" id="title" name="title" />
-          <div id="title-error" class="error-message"></div>
-        </div>
-
-        <div class="form-group">
-          <label for="content">Content</label>
-          <textarea id="content" name="content"></textarea>
-          <div id="content-error" class="error-message"></div>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-          ${this.currentEditId ? 'Update Post' : 'Create Post'}
-        </button>
-
-        ${
-          this.currentEditId
-            ? `<button type="button" id="cancel-edit" class="btn btn-secondary">Cancel</button>`
-            : ''
-        }
-      </form>
-    `;
-
-    this.attachFormEventListeners();
-  }
-
   attachFormEventListeners() {
     const form = document.getElementById('post-form');
-    const cancelBtn = document.getElementById('cancel-edit');
+    const cancelEdit = document.getElementById('cancel-edit');
 
     if (form) {
       form.addEventListener('submit', this.handleSubmit);
     }
 
-    if (cancelBtn) {
-      cancelBtn.addEventListener('click', () => this.cancelEdit());
+    if (cancelEdit) {
+      cancelEdit.addEventListener('click', () => this.cancelEdit());
     }
   }
 
@@ -201,6 +176,14 @@ class BlogView {
     this.notifyObservers('onPostEdit', postId);
   }
 
+  handleDelete(postId) {
+    const confirmed = confirm('Are you sure you want to delete this post?');
+    if (confirmed) {
+      this.notifyObservers('onPostDelete', postId);
+    }
+  }
+
+  // Edit modal
   showEditModal(postData) {
     this.currentEditId = postData.id;
     this.renderEditForm(postData);
@@ -216,27 +199,61 @@ class BlogView {
     this.editFormContainer.innerHTML = `
       <form id="edit-post-form" class="post-form">
         <div class="form-group">
-          <label for="edit-title">Title</label>
-          <input type="text" id="edit-title" value="${this.escapeHtml(postData.title)}" />
+          <label>Title</label>
+          <input id="edit-title" value="${this.escapeHtml(postData.title)}" />
           <div id="edit-title-error" class="error-message"></div>
         </div>
 
         <div class="form-group">
-          <label for="edit-content">Content</label>
+          <label>Content</label>
           <textarea id="edit-content">${this.escapeHtml(postData.content)}</textarea>
           <div id="edit-content-error" class="error-message"></div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="submit" class="btn btn-primary">Save</button>
         <button type="button" id="close-edit-modal" class="btn btn-secondary">Cancel</button>
       </form>
     `;
+
+    document
+      .getElementById('edit-post-form')
+      .addEventListener('submit', this.handleEditSubmit);
 
     document
       .getElementById('close-edit-modal')
       .addEventListener('click', this.hideEditModal);
   }
 
+  handleEditSubmit(e) {
+    e.preventDefault();
+
+    const title = document.getElementById('edit-title').value.trim();
+    const content = document.getElementById('edit-content').value.trim();
+
+    const postData = { title, content };
+    const errors = this.validateForm(postData);
+
+    if (errors.length > 0) {
+      this.displayEditFormErrors(errors);
+      return;
+    }
+
+    this.notifyObservers('onPostUpdate', {
+      id: this.currentEditId,
+      ...postData,
+    });
+
+    this.hideEditModal();
+  }
+
+  displayEditFormErrors(errors) {
+    errors.forEach((error) => {
+      const el = document.getElementById(`edit-${error.field}-error`);
+      if (el) el.textContent = error.message;
+    });
+  }
+
+  // Utilities
   cancelEdit() {
     this.currentEditId = null;
     this.renderPostForm();
@@ -259,18 +276,12 @@ class BlogView {
   displayFormErrors(errors) {
     errors.forEach((error) => {
       const el = document.getElementById(`${error.field}-error`);
-      if (el) {
-        el.textContent = error.message;
-        el.style.display = 'block';
-      }
+      if (el) el.textContent = error.message;
     });
   }
 
   clearFormErrors() {
-    document.querySelectorAll('.error-message').forEach((el) => {
-      el.textContent = '';
-      el.style.display = 'none';
-    });
+    document.querySelectorAll('.error-message').forEach((el) => (el.textContent = ''));
   }
 
   showLoading() {
@@ -302,4 +313,5 @@ class BlogView {
   }
 }
 
+window.viewExplanation = viewExplanation;
 window.BlogView = BlogView;
