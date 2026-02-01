@@ -74,7 +74,7 @@ class BlogController {
   handlePostEdit(postId) {
     const post = this.model.getPostById(postId);
     if (post) {
-      this.view.fillFormForEdit(post);
+      this.view.showEditModal(post);
     }
   }
 
