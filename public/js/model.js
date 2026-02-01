@@ -149,6 +149,10 @@ class BlogModel {
       this.setLoading(false);
     }
   }
+
+  getPostById(postId) {
+    return this.posts.find(post => post.id === postId);
+  }
 }
 
 window.BlogModel = BlogModel;
