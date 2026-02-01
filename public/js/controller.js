@@ -74,7 +74,7 @@ class BlogController {
   handlePostEdit(postId) {
     const post = this.model.getPostById(postId);
     if (post) {
-      this.view.showEditModal(post);
+      this.view.showEditModal(post); // ✅ هماهنگ با View و کد استاد
     }
   }
 
@@ -85,12 +85,12 @@ class BlogController {
   }
 
   handlePostCreated() {
-    this.view.clearForm();
+    this.view.clearForm?.();
     this.loadPosts();
   }
 
   handlePostUpdated() {
-    this.view.clearForm();
+    this.view.clearForm?.();
     this.loadPosts();
   }
 
@@ -120,7 +120,7 @@ class BlogController {
   }
 
   reset() {
-    this.view.clearForm();
+    this.view.clearForm?.();
     this.loadPosts();
   }
 }
