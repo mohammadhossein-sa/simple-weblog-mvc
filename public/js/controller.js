@@ -61,6 +61,23 @@ class BlogController {
     this.view.showSuccess('Post created successfully');
   }
 
+  async handlePostUpdate(updateData) {
+    await this.model.updatePost(updateData.id, updateData);
+    this.view.showSuccess('Post updated successfully');
+  }
+
+  async handlePostDelete(postId) {
+    await this.model.deletePost(postId);
+    this.view.showSuccess('Post deleted successfully');
+  }
+
+  handlePostEdit(postId) {
+    const post = this.model.getPostById(postId);
+    if (post) {
+      this.view.fillFormForEdit(post);
+    }
+  }
+
   handleViewInitialized() {}
 
   handlePostsLoaded(posts) {
@@ -69,6 +86,15 @@ class BlogController {
 
   handlePostCreated() {
     this.view.clearForm();
+    this.loadPosts();
+  }
+
+  handlePostUpdated() {
+    this.view.clearForm();
+    this.loadPosts();
+  }
+
+  handlePostDeleted() {
     this.loadPosts();
   }
 
@@ -82,6 +108,20 @@ class BlogController {
 
   handleError(message) {
     this.view.showError(message);
+  }
+
+  getState() {
+    return {
+      isInitialized: this.isInitialized,
+      postsCount: this.model.posts.length,
+      currentEditId: this.view.currentEditId,
+      isLoading: this.model.isLoading,
+    };
+  }
+
+  reset() {
+    this.view.clearForm();
+    this.loadPosts();
   }
 }
 
