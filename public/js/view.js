@@ -53,18 +53,8 @@ class BlogView {
   renderPostForm() {
     this.formContainer.innerHTML = `
       <form id="post-form">
-        <div>
-          <label>Title</label>
-          <input id="title" name="title" />
-          <div id="title-error" class="error-message"></div>
-        </div>
-
-        <div>
-          <label>Content</label>
-          <textarea id="content" name="content"></textarea>
-          <div id="content-error" class="error-message"></div>
-        </div>
-
+        <input id="title" name="title" placeholder="Title" />
+        <textarea id="content" name="content" placeholder="Content"></textarea>
         <button type="submit">Create Post</button>
       </form>
     `;
@@ -82,52 +72,55 @@ class BlogView {
   handleSubmit(e) {
     e.preventDefault();
 
-    const formData = new FormData(e.target);
-    const postData = {
-      title: formData.get('title').trim(),
-      content: formData.get('content').trim(),
-    };
-
-    this.clearFormErrors();
-
-    const errors = this.validateForm(postData);
-    if (errors.length > 0) {
-      this.displayFormErrors(errors);
-      return;
-    }
-
-    this.notifyObservers('onPostCreate', postData);
-  }
-
-  validateForm(postData) {
-    const errors = [];
-
-    if (!postData.title || postData.title.length < 3) {
-      errors.push({ field: 'title', message: 'Title must be at least 3 characters long' });
-    }
-
-    if (!postData.content || postData.content.length < 10) {
-      errors.push({ field: 'content', message: 'Content must be at least 10 characters long' });
-    }
-
-    return errors;
-  }
-
-  displayFormErrors(errors) {
-    errors.forEach((error) => {
-      const el = document.getElementById(`${error.field}-error`);
-      if (el) el.textContent = error.message;
+    const data = new FormData(e.target);
+    this.notifyObservers('onPostCreate', {
+      title: data.get('title').trim(),
+      content: data.get('content').trim(),
     });
   }
 
-  clearFormErrors() {
-    document
-      .querySelectorAll('.error-message')
-      .forEach((el) => (el.textContent = ''));
+  // Posts rendering
+  renderPosts(posts) {
+    if (!posts || posts.length === 0) {
+      this.postsContainer.innerHTML = '<p>No posts yet</p>';
+      return;
+    }
+
+    this.postsContainer.innerHTML = posts
+      .map((post) => this.renderPostCard(post))
+      .join('');
+
+    this.attachPostEventListeners();
   }
 
-  // Posts rendering (placeholder)
-  renderPosts(posts) {}
+  renderPostCard(post) {
+    return `
+      <article class="post-card" data-post-id="${post.id}">
+        <h3>${post.title}</h3>
+        <p>${post.content}</p>
+        <button data-action="edit" data-post-id="${post.id}">Edit</button>
+        <button data-action="delete" data-post-id="${post.id}">Delete</button>
+      </article>
+    `;
+  }
+
+  attachPostEventListeners() {
+    this.postsContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+
+      const postId = Number(btn.dataset.postId);
+      const action = btn.dataset.action;
+
+      if (action === 'edit') {
+        this.notifyObservers('onPostEdit', postId);
+      }
+
+      if (action === 'delete') {
+        this.notifyObservers('onPostDelete', postId);
+      }
+    });
+  }
 }
 
 window.viewExplanation = viewExplanation;
