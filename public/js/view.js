@@ -9,7 +9,6 @@ class BlogView {
     this.editModal = null;
     this.editFormContainer = null;
 
-    // Bind methods to maintain context
     this.renderPosts = this.renderPosts.bind(this);
     this.renderPostForm = this.renderPostForm.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -25,7 +24,6 @@ class BlogView {
     this.handleEditSubmit = this.handleEditSubmit.bind(this);
   }
 
-  // Observer pattern implementation
   addObserver(observer) {
     this.observers.push(observer);
   }
@@ -42,7 +40,6 @@ class BlogView {
     });
   }
 
-  // Initialization
   initialize() {
     this.setupDOMElements();
     this.renderPostForm();
@@ -65,11 +62,10 @@ class BlogView {
       !this.editModal ||
       !this.editFormContainer
     ) {
-      throw new Error('Required DOM elements not found. Check HTML structure.');
+      throw new Error('Required DOM elements not found.');
     }
   }
 
-  // Rendering methods
   renderPosts(posts) {
     if (!posts || posts.length === 0) {
       this.postsContainer.innerHTML = `
@@ -100,21 +96,62 @@ class BlogView {
           </div>
         </div>
         <div class="post-content">
-          ${this.escapeHtml(post.content)}
+          ${this.renderPostContent(post.content)}
         </div>
         <div class="post-actions">
-          <button class="btn btn-edit" data-action="edit" data-post-id="${post.id}">
-            ✏️ Edit
-          </button>
-          <button class="btn btn-delete" data-action="delete" data-post-id="${post.id}">
-            🗑️ Delete
-          </button>
+          <button class="btn btn-edit" data-action="edit" data-post-id="${post.id}">✏️ Edit</button>
+          <button class="btn btn-delete" data-action="delete" data-post-id="${post.id}">🗑️ Delete</button>
         </div>
       </article>
     `;
   }
 
-  // Event handling
+  /* ====== ✅ مرحله 5-3 ====== */
+
+  renderPostContent(content) {
+    return this.escapeHtml(content)
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>')
+      .replace(/^/, '<p>')
+      .replace(/$/, '</p>');
+  }
+
+  renderPostForm() {
+    const isEdit = Boolean(this.currentEditId);
+
+    this.formContainer.innerHTML = `
+      <form id="post-form" class="post-form">
+        <h3>${isEdit ? 'Edit Post' : 'Create New Post'}</h3>
+
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input id="title" name="title" />
+          <div id="title-error" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="content">Content</label>
+          <textarea id="content" name="content"></textarea>
+          <div id="content-error" class="error-message"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          ${isEdit ? 'Update' : 'Create'}
+        </button>
+
+        ${
+          isEdit
+            ? `<button type="button" id="cancel-edit" class="btn btn-secondary">Cancel</button>`
+            : ''
+        }
+      </form>
+    `;
+
+    this.attachFormEventListeners();
+  }
+
+  /* ========================== */
+
   attachPostEventListeners() {
     this.postsContainer.addEventListener('click', (e) => {
       const action = e.target.closest('[data-action]');
@@ -122,13 +159,8 @@ class BlogView {
 
       const postId = Number(action.dataset.postId);
 
-      if (action.dataset.action === 'edit') {
-        this.handleEdit(postId);
-      }
-
-      if (action.dataset.action === 'delete') {
-        this.handleDelete(postId);
-      }
+      if (action.dataset.action === 'edit') this.handleEdit(postId);
+      if (action.dataset.action === 'delete') this.handleDelete(postId);
     });
   }
 
@@ -136,13 +168,8 @@ class BlogView {
     const form = document.getElementById('post-form');
     const cancelEdit = document.getElementById('cancel-edit');
 
-    if (form) {
-      form.addEventListener('submit', this.handleSubmit);
-    }
-
-    if (cancelEdit) {
-      cancelEdit.addEventListener('click', () => this.cancelEdit());
-    }
+    if (form) form.addEventListener('submit', this.handleSubmit);
+    if (cancelEdit) cancelEdit.addEventListener('click', () => this.cancelEdit());
   }
 
   handleSubmit(e) {
@@ -163,10 +190,7 @@ class BlogView {
     }
 
     if (this.currentEditId) {
-      this.notifyObservers('onPostUpdate', {
-        id: this.currentEditId,
-        ...postData,
-      });
+      this.notifyObservers('onPostUpdate', { id: this.currentEditId, ...postData });
     } else {
       this.notifyObservers('onPostCreate', postData);
     }
@@ -177,13 +201,11 @@ class BlogView {
   }
 
   handleDelete(postId) {
-    const confirmed = confirm('Are you sure you want to delete this post?');
-    if (confirmed) {
+    if (confirm('Are you sure?')) {
       this.notifyObservers('onPostDelete', postId);
     }
   }
 
-  // Edit modal
   showEditModal(postData) {
     this.currentEditId = postData.id;
     this.renderEditForm(postData);
@@ -198,29 +220,17 @@ class BlogView {
   renderEditForm(postData) {
     this.editFormContainer.innerHTML = `
       <form id="edit-post-form" class="post-form">
-        <div class="form-group">
-          <label>Title</label>
-          <input id="edit-title" value="${this.escapeHtml(postData.title)}" />
-          <div id="edit-title-error" class="error-message"></div>
-        </div>
-
-        <div class="form-group">
-          <label>Content</label>
-          <textarea id="edit-content">${this.escapeHtml(postData.content)}</textarea>
-          <div id="edit-content-error" class="error-message"></div>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" id="close-edit-modal" class="btn btn-secondary">Cancel</button>
+        <input id="edit-title" value="${this.escapeHtml(postData.title)}" />
+        <textarea id="edit-content">${this.escapeHtml(postData.content)}</textarea>
+        <button type="submit">Save</button>
+        <button type="button" id="close-edit-modal">Cancel</button>
       </form>
     `;
 
-    document
-      .getElementById('edit-post-form')
+    document.getElementById('edit-post-form')
       .addEventListener('submit', this.handleEditSubmit);
 
-    document
-      .getElementById('close-edit-modal')
+    document.getElementById('close-edit-modal')
       .addEventListener('click', this.hideEditModal);
   }
 
@@ -230,9 +240,7 @@ class BlogView {
     const title = document.getElementById('edit-title').value.trim();
     const content = document.getElementById('edit-content').value.trim();
 
-    const postData = { title, content };
-    const errors = this.validateForm(postData);
-
+    const errors = this.validateForm({ title, content });
     if (errors.length > 0) {
       this.displayEditFormErrors(errors);
       return;
@@ -240,7 +248,8 @@ class BlogView {
 
     this.notifyObservers('onPostUpdate', {
       id: this.currentEditId,
-      ...postData,
+      title,
+      content,
     });
 
     this.hideEditModal();
@@ -253,7 +262,6 @@ class BlogView {
     });
   }
 
-  // Utilities
   cancelEdit() {
     this.currentEditId = null;
     this.renderPostForm();
@@ -261,15 +269,10 @@ class BlogView {
 
   validateForm(postData) {
     const errors = [];
-
-    if (!postData.title || postData.title.length < 3) {
-      errors.push({ field: 'title', message: 'Title must be at least 3 characters long' });
-    }
-
-    if (!postData.content || postData.content.length < 10) {
-      errors.push({ field: 'content', message: 'Content must be at least 10 characters long' });
-    }
-
+    if (!postData.title || postData.title.length < 3)
+      errors.push({ field: 'title', message: 'Title too short' });
+    if (!postData.content || postData.content.length < 10)
+      errors.push({ field: 'content', message: 'Content too short' });
     return errors;
   }
 
@@ -281,7 +284,8 @@ class BlogView {
   }
 
   clearFormErrors() {
-    document.querySelectorAll('.error-message').forEach((el) => (el.textContent = ''));
+    document.querySelectorAll('.error-message')
+      .forEach((el) => (el.textContent = ''));
   }
 
   showLoading() {
@@ -313,5 +317,4 @@ class BlogView {
   }
 }
 
-window.viewExplanation = viewExplanation;
 window.BlogView = BlogView;
