@@ -51,6 +51,24 @@ class BlogView {
       throw new Error('Required DOM elements not found');
     }
   }
+
+  // Utility methods
+  formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
 }
 
 window.viewExplanation = viewExplanation;
