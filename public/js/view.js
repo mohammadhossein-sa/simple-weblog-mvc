@@ -1,16 +1,16 @@
 class BlogView {
   constructor() {
-    // DOM references
     this.postsContainer = null;
     this.formContainer = null;
     this.loadingIndicator = null;
     this.errorContainer = null;
-
-    // State
     this.currentEditId = null;
-
-    // Observers
     this.observers = [];
+
+    // Bind methods
+    this.renderPostForm = this.renderPostForm.bind(this);
+    this.renderPosts = this.renderPosts.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   // Observer pattern
@@ -18,12 +18,8 @@ class BlogView {
     this.observers.push(observer);
   }
 
-  removeObserver(observer) {
-    this.observers = this.observers.filter(o => o !== observer);
-  }
-
   notifyObservers(event, data) {
-    this.observers.forEach(observer => {
+    this.observers.forEach((observer) => {
       if (observer[event]) {
         observer[event](data);
       }
@@ -33,6 +29,7 @@ class BlogView {
   // Initialization
   initialize() {
     this.setupDOMElements();
+    this.renderPostForm();
     this.notifyObservers('onViewInitialized');
   }
 
@@ -52,23 +49,85 @@ class BlogView {
     }
   }
 
-  // Utility methods
-  formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+  // Form rendering
+  renderPostForm() {
+    this.formContainer.innerHTML = `
+      <form id="post-form">
+        <div>
+          <label>Title</label>
+          <input id="title" name="title" />
+          <div id="title-error" class="error-message"></div>
+        </div>
+
+        <div>
+          <label>Content</label>
+          <textarea id="content" name="content"></textarea>
+          <div id="content-error" class="error-message"></div>
+        </div>
+
+        <button type="submit">Create Post</button>
+      </form>
+    `;
+
+    this.attachFormEventListeners();
+  }
+
+  attachFormEventListeners() {
+    const form = document.getElementById('post-form');
+    if (form) {
+      form.addEventListener('submit', this.handleSubmit);
+    }
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const postData = {
+      title: formData.get('title').trim(),
+      content: formData.get('content').trim(),
+    };
+
+    this.clearFormErrors();
+
+    const errors = this.validateForm(postData);
+    if (errors.length > 0) {
+      this.displayFormErrors(errors);
+      return;
+    }
+
+    this.notifyObservers('onPostCreate', postData);
+  }
+
+  validateForm(postData) {
+    const errors = [];
+
+    if (!postData.title || postData.title.length < 3) {
+      errors.push({ field: 'title', message: 'Title must be at least 3 characters long' });
+    }
+
+    if (!postData.content || postData.content.length < 10) {
+      errors.push({ field: 'content', message: 'Content must be at least 10 characters long' });
+    }
+
+    return errors;
+  }
+
+  displayFormErrors(errors) {
+    errors.forEach((error) => {
+      const el = document.getElementById(`${error.field}-error`);
+      if (el) el.textContent = error.message;
     });
   }
 
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  clearFormErrors() {
+    document
+      .querySelectorAll('.error-message')
+      .forEach((el) => (el.textContent = ''));
   }
+
+  // Posts rendering (placeholder)
+  renderPosts(posts) {}
 }
 
 window.viewExplanation = viewExplanation;
