@@ -62,6 +62,37 @@ class BlogModel {
 
     return errors;
   }
+
+  async createPost(postData) {
+    this.setLoading(true);
+
+    try {
+      const validationErrors = this.validatePostData(postData);
+      if (validationErrors.length > 0) {
+        throw new Error(validationErrors.join('. '));
+      }
+
+      const response = await fetch(this.apiBaseUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const newPost = await response.json();
+      this.posts.unshift(newPost);
+      this.notifyObservers('onPostCreated', newPost);
+      return newPost;
+    } catch (error) {
+      this.notifyObservers('onError', error.message);
+      throw error;
+    } finally {
+      this.setLoading(false);
+    }
+  }
 }
 
 window.BlogModel = BlogModel;
