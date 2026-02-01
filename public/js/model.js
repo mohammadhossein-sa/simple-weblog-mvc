@@ -127,6 +127,28 @@ class BlogModel {
       this.setLoading(false);
     }
   }
+
+  async deletePost(postId) {
+    this.setLoading(true);
+
+    try {
+      const response = await fetch(`${this.apiBaseUrl}/${postId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      this.posts = this.posts.filter(post => post.id !== postId);
+      this.notifyObservers('onPostDeleted', postId);
+    } catch (error) {
+      this.notifyObservers('onError', error.message);
+      throw error;
+    } finally {
+      this.setLoading(false);
+    }
+  }
 }
 
 window.BlogModel = BlogModel;
