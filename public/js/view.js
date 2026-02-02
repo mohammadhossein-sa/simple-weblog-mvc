@@ -22,8 +22,6 @@ class BlogView {
     this.hideLoading = this.hideLoading.bind(this);
     this.showError = this.showError.bind(this);
     this.hideError = this.hideError.bind(this);
-
-    // renderPostForm هنوز پیاده‌سازی نشده، پس bind نمی‌کنیم
   }
 
   addObserver(observer) {
@@ -44,7 +42,6 @@ class BlogView {
 
   initialize() {
     this.setupDOMElements();
-    // this.renderPostForm();  // هنوز پیاده نشده
     this.notifyObservers('onViewInitialized');
   }
 
@@ -261,7 +258,7 @@ class BlogView {
 
   cancelEdit() {
     this.currentEditId = null;
-    // this.renderPostForm(); // فعلاً پیاده نشده
+    // this.renderPostForm(); // هنوز پیاده‌سازی نشده
   }
 
   validateForm(postData) {
@@ -299,12 +296,19 @@ class BlogView {
   }
 
   showError(message) {
-    this.errorContainer.textContent = message;
+    this.errorContainer.innerHTML = `
+      <div class="error-message">
+        <span class="error-icon">⚠️</span>
+        <span class="error-text">${this.escapeHtml(message)}</span>
+        <button class="error-close" onclick="this.parentElement.parentElement.style.display='none'">×</button>
+      </div>
+    `;
     this.errorContainer.style.display = 'block';
   }
 
   hideError() {
     this.errorContainer.style.display = 'none';
+    this.errorContainer.innerHTML = ''; // پاک کردن محتوای قبلی
   }
 
   showSuccess(message) {
