@@ -1,166 +1,169 @@
-```markdown
-# 🎓 Educational Blog MVC + REST API Project
+# 🎓 Educational Blog - MVC + REST API Project
 
-A complete, educational blog application built with **pure Vanilla JavaScript** using the **MVC (Model-View-Controller)** architecture pattern.  
-This project is designed to clearly demonstrate core software engineering concepts: clean separation of concerns, the Observer pattern, RESTful API integration, client-side validation, reactive UI updates, and proper error/loading/success handling — all without any frameworks.
+**یک پروژه کامل وبلاگ آموزشی**  
+ساخته‌شده با **جاوااسکریپت خالص** و معماری **MVC**، برای یادگیری اصول مهندسی نرم‌افزار
 
-Perfect for learning modern JavaScript application architecture and full CRUD operations with a simple JSON-based backend.
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/mohammadhossein-sa/simple-weblog-mvc.git)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=for-the-badge&logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Node.js](https://img.shields.io/badge/Node.js-Express-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/Educational-Project-purple?style=for-the-badge)](./LICENSE)
 
-## ✨ Key Features
+## ✨ ویژگی‌های کلیدی
 
-- 🏗 **Strict MVC Architecture** — Clear separation: Model (data & API), View (UI & rendering), Controller (logic & coordination)
-- 🔄 **Full CRUD Operations** — Create, Read, Update, Delete blog posts
-- 🔔 **User Feedback** — Success toasts (green), error messages (red), and loading spinner
-- ✏ **Modal-based Editing** — Clean edit interface in a modal window
-- 🔍 **Client-side Form Validation** — Minimum length checks for title (≥3) & content (≥10)
-- 👀 **Observer Pattern** — Automatic UI updates when data changes
-- ⏳ **Loading & Error States** — Visual feedback during API requests
-- 📱 **Responsive Design** — Mobile-friendly layout with clean CSS
-- ⚡ **RESTful API** — Standard HTTP methods with proper status codes
-- 🗄 **Simple JSON Persistence** — Data stored in a file (no database required)
+| دسته‌بندی | امکانات |
+|-----------|---------|
+| **🏗 معماری** | MVC خالص + الگوی Observer |
+| **🔧 عملیات** | CRUD کامل + RESTful API |
+| **🎨 رابط کاربری** | واکنش‌گرا + Modal ویرایش + Toast |
+| **🛡 اعتبارسنجی** | بررسی عنوان (≥۳) و محتوا (≥۱۰) کاراکتر |
+| **⚡ عملکرد** | لودینگ هوشمند + مدیریت خطا |
+| **📁 ذخیره‌سازی** | JSON File + بدون نیاز به دیتابیس |
 
-## 🚀 Quick Start
+## 🚀 شروع سریع
 
-### Prerequisites
-- Node.js (v14 or higher)
-- npm
+### پیش‌نیازها
+- Node.js نسخه ۱۴ یا بالاتر
+- npm یا yarn
 
-### Installation & Run
+### نصب و اجرا
 
-1. Clone the repository
 ```bash
+# 1. کلون کردن پروژه
 git clone https://github.com/mohammadhossein-sa/simple-weblog-mvc.git
 cd simple-weblog-mvc
-```
 
-2. Install dependencies
-```bash
+# 2. نصب وابستگی‌ها
 npm install
+
+# 3. اجرای پروژه
+npm start          # حالت تولید
+npm run dev        # حالت توسعه (توصیه می‌شود)
 ```
 
-3. Start the server
-```bash
-# Simple start
-npm start
-
-# Development mode with auto-reload (recommended)
-npm run dev
-```
-
-4. Open in browser
+سپس مرورگر خود را باز کنید و به آدرس زیر بروید:
 ```
 http://localhost:3001
 ```
 
-## 📁 Project Structure
+## 📁 ساختار پروژه
 
 ```
 simple-weblog-mvc/
-├── css/
-│   └── style.css           # Responsive & modern UI styles
-├── js/
-│   ├── model.js            # Data layer — API calls, validation, state
-│   ├── view.js             # UI layer — rendering, forms, modal, feedback
-│   ├── controller.js       # Logic layer — coordinates Model ↔ View
-│   └── app.js              # App bootstrap & observer setup
-├── index.html              # Main HTML entry point
-├── server.js               # Express.js REST API server
-├── package.json
-└── README.md
+├── 📂 css/
+│   └── style.css           # استایل‌های مدرن و واکنش‌گرا
+├── 📂 js/
+│   ├── model.js            # لایه داده - API و اعتبارسنجی
+│   ├── view.js             # لایه نمایش - رندرینگ و UI
+│   ├── controller.js       # لایه منطق - هماهنگ‌کننده
+│   └── app.js              # راه‌اندازی و Observer
+├── 📜 index.html           # نقطه ورود اصلی
+├── 📜 server.js            # سرور Express.js
+├── 📜 package.json
+└── 📜 README.md
 ```
 
-## 🏛 Architecture Overview
+## 🏛 نمای معماری
 
-### MVC Pattern
+### MVC + Observer Pattern
 
 ```
-┌─────────────┐      ┌──────────────┐      ┌─────────────┐
-│   Model     │◄────►│  Controller  ├─────►│    View     │
-│ - Data      │      │ - Business   │      │ - Rendering │
-│ - API calls │      │   logic      │      │ - DOM       │
-│ - Validation│      │ - Events     │      │ - Feedback  │
-└─────────────┘      └──────────────┘      └─────────────┘
+┌─────────────────────────────────────────────────┐
+│                    View                         │
+│  • رندرینگ UI                                  │
+│  • فرم‌ها و Modal                              │
+│  • نمایش پیام‌ها                               │
+└───────────────┬─────────────────────────────────┘
+                │
+                │ Event Trigger
+                ▼
+┌─────────────────────────────────────────────────┐
+│               Controller                         │
+│  • مدیریت منطق کسب‌وکار                        │
+│  • هماهنگی Model ↔ View                        │
+│  • پردازش رویدادها                             │
+└───────────────┬─────────────────────────────────┘
+                │
+                │ Data Request/Update
+                ▼
+┌─────────────────────────────────────────────────┐
+│                    Model                         │
+│  • ارتباط با API                                │
+│  • اعتبارسنجی داده                             │
+│  • مدیریت State                                │
+└─────────────────────────────────────────────────┘
 ```
 
-### Observer Pattern (Pub/Sub)
-
-Used for loose coupling and reactive updates:
-- Model notifies observers when data changes (e.g., new post created)
-- View notifies when user interacts (form submit, button clicks)
-- Controller handles coordination and side effects
+### Observer Pattern
+- Model تغییرات داده را اطلاع‌رسانی می‌کند
+- View تعاملات کاربر را گزارش می‌دهد
+- Controller همه‌چیز را هماهنگ می‌کند
 
 ## 🔌 REST API Endpoints
 
-| Method | Endpoint            | Description                     |
-|--------|---------------------|---------------------------------|
-| GET    | `/api/posts`        | Get all blog posts              |
-| POST   | `/api/posts`        | Create a new blog post          |
-| PUT    | `/api/posts/:id`    | Update an existing post         |
-| DELETE | `/api/posts/:id`    | Delete a blog post              |
+| متد | مسیر | توضیحات | کد پاسخ |
+|-----|------|---------|---------|
+| `GET` | `/api/posts` | دریافت همه پست‌ها | `200 OK` |
+| `POST` | `/api/posts` | ایجاد پست جدید | `201 Created` |
+| `PUT` | `/api/posts/:id` | ویرایش پست | `200 OK` |
+| `DELETE` | `/api/posts/:id` | حذف پست | `204 No Content` |
 
-```markdown
-**Example response — Create Post (201 Created):**
+**مثال پاسخ API (ایجاد پست):**
 ```json
 {
   "id": 14,
-  "title": "My First Blog Post",
-  "content": "This is a simple introduction to my blog using MVC architecture. Here I share thoughts on web development and JavaScript patterns.",
-  "author": "Mohammadhossein",
+  "title": "اولین پست من در وبلاگ",
+  "content": "این یک معرفی ساده از وبلاگ من با معماری MVC است.",
+  "author": "محمدحسین",
   "createdAt": "2026-02-02T08:54:20.000Z"
 }
 ```
 
+## 🛠 تکنولوژی‌های استفاده‌شده
 
-## 🔧 Technologies & Concepts Demonstrated
+### فرانت‌اند
+- **JavaScript خالص** (ES6+، async/await، fetch)
+- **HTML5 & CSS3** (Flexbox، Grid، Variables، Animations)
+- **الگوهای طراحی** (Observer/Pub-Sub، MVC)
+- **مدیریت DOM** و رویدادها
 
-### Frontend
-- Vanilla JavaScript (ES6+ classes, async/await, fetch)
-- HTML5 & CSS3 (flex, grid, CSS variables, animations)
-- Observer / Pub-Sub pattern
-- DOM manipulation & event delegation
-- Client-side form validation
-- Modal UI + success/error/loading feedback
+### بک‌اند
+- **Node.js** با **Express.js**
+- **JSON File Persistence** (سبک و بدون نیاز به دیتابیس)
 
-### Backend
-- Node.js
-- Express.js (simple REST API server)
-- JSON file persistence (lightweight, no database setup needed)
+### مفاهیم آموزشی
+- جداسازی مسئولیت‌ها (SoC)
+- برنامه‌نویسی واکنش‌گرا
+- طراحی APIهای RESTful
+- مدیریت خطا و بازخورد کاربر
+- رابط کاربری دسترس‌پذیر
 
-### Key Learning Concepts
-- Separation of Concerns (SoC)
-- MVC pattern in pure JavaScript
-- Reactive UI with Observer pattern
-- RESTful API design & integration
-- Error handling & user feedback
-- Responsive & accessible UI
-- Async programming (fetch + async/await)
+## 📚 دستاوردهای یادگیری
 
-## 🛠 Development Scripts
+این پروژه به عنوان بخشی از درس **مهندسی نرم‌افزار** توسعه یافته تا مفاهیم زیر را نمایش دهد:
+
+✅ **ساختاردهی برنامه‌های بزرگ جاوااسکریپت بدون فریم‌ورک**  
+✅ **کاربرد عملی الگوهای طراحی (MVC + Observer)**  
+✅ **مدیریت State و ارتباط با API**  
+✅ **توسعه تدریجی و دیباگینگ**  
+✅ **توجه به تجربه کاربری (UX) و بازخورد بصری**
+
+## 🧩 اسکریپت‌های توسعه
 
 ```bash
-# Start server (production)
+# اجرای سرور در حالت Production
 npm start
 
-# Development mode with auto-reload (recommended)
+# اجرای سرور در حالت Development با ری‌لود خودکار
 npm run dev
 ```
 
-## 📚 Learning Outcomes
+## 👤 نویسنده و مجوز
 
-This project was built as part of a **Software Engineering** course to demonstrate:
+**👨‍💻 محمدحسین سالملیان**  
+[![GitHub](https://img.shields.io/badge/GitHub-Profile-black?style=flat&logo=github)](https://github.com/mohammadhossein-sa)  
+[![Repository](https://img.shields.io/badge/Repository-Link-green?style=flat)](https://github.com/mohammadhossein-sa/simple-weblog-mvc.git)
 
-- How to structure large JavaScript applications without frameworks
-- Practical use of design patterns (MVC + Observer)
-- Clean API integration and state management
-- User-centered UI/UX feedback (loading, success, error states)
-- Incremental development and debugging
+---
 
-## 👤 Author
-
-**Mohammad hossein salmalian**  
-GitHub: [@mohammadhossein-sa](https://github.com/mohammadhossein-sa)  
-Repository: https://github.com/mohammadhossein-sa/simple-weblog-mvc.git  
-
-Built with ❤️ for educational purposes — February 2026
-```
-
+**📌 نکته:** این پروژه با هدف **آموزشی** و نمایش مفاهیم مهندسی نرم‌افزار توسعه یافته است.  
+ساخته‌شده با ❤️ برای جامعه توسعه‌دهندگان - بهمن ۱۴۰۴
