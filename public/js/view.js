@@ -9,7 +9,7 @@ class BlogView {
     this.editModal = null;
     this.editFormContainer = null;
 
-    // Bind methods to maintain context
+    // Bind methods to maintain context (فقط متدهای موجود)
     this.renderPosts = this.renderPosts.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
@@ -22,6 +22,7 @@ class BlogView {
     this.hideLoading = this.hideLoading.bind(this);
     this.showError = this.showError.bind(this);
     this.hideError = this.hideError.bind(this);
+    this.renderPostForm = this.renderPostForm.bind(this); // اضافه شد
   }
 
   addObserver(observer) {
@@ -42,6 +43,7 @@ class BlogView {
 
   initialize() {
     this.setupDOMElements();
+    this.renderPostForm();          // حالا فرم نمایش داده می‌شود
     this.notifyObservers('onViewInitialized');
   }
 
@@ -63,6 +65,34 @@ class BlogView {
     ) {
       throw new Error('Required DOM elements not found. Check HTML structure.');
     }
+  }
+
+  // فرم ایجاد پست جدید (این متد نبود و مشکل اصلی بود)
+  renderPostForm() {
+    console.log('[VIEW] Rendering create post form');
+
+    this.formContainer.innerHTML = `
+      <form id="post-form" class="post-form">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" placeholder="Enter post title" required />
+          <div id="title-error" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="content">Content</label>
+          <textarea id="content" name="content" rows="6" placeholder="Write your post here..." required></textarea>
+          <div id="content-error" class="error-message"></div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Create Post</button>
+          ${this.currentEditId ? '<button type="button" id="cancel-edit" class="btn btn-cancel">Cancel Edit</button>' : ''}
+        </div>
+      </form>
+    `;
+
+    this.attachFormEventListeners();
   }
 
   renderPosts(posts) {
@@ -144,35 +174,46 @@ class BlogView {
   handleSubmit(e) {
     e.preventDefault();
 
+    console.log('[VIEW] handleSubmit triggered');
+
     const formData = new FormData(e.target);
     const postData = {
       title: formData.get('title').trim(),
       content: formData.get('content').trim(),
     };
 
+    console.log('[VIEW] Collected form data:', postData);
+
     this.clearFormErrors();
 
     const errors = this.validateForm(postData);
     if (errors.length > 0) {
+      console.log('[VIEW] Validation errors found:', errors);
       this.displayFormErrors(errors);
       return;
     }
 
+    console.log('[VIEW] Form validated successfully');
+
     if (this.currentEditId) {
+      console.log('[VIEW] Notifying UPDATE for post ID:', this.currentEditId);
       this.notifyObservers('onPostUpdate', {
         id: this.currentEditId,
         ...postData,
       });
     } else {
+      console.log('[VIEW] Notifying CREATE new post');
       this.notifyObservers('onPostCreate', postData);
     }
   }
 
   handleEdit(postId) {
+    console.log('[VIEW] handleEdit called for post ID:', postId);
     this.notifyObservers('onPostEdit', postId);
   }
 
   handleDelete(postId) {
+    console.log('[VIEW] handleDelete called for post ID:', postId);
     const confirmed = confirm('Are you sure you want to delete this post?');
     if (confirmed) {
       this.notifyObservers('onPostDelete', postId);
@@ -180,17 +221,20 @@ class BlogView {
   }
 
   showEditModal(postData) {
+    console.log('[VIEW] Showing edit modal for post:', postData);
     this.currentEditId = postData.id;
     this.renderEditForm(postData);
     this.editModal.style.display = 'block';
   }
 
   hideEditModal() {
+    console.log('[VIEW] Hiding edit modal');
     this.editModal.style.display = 'none';
     this.currentEditId = null;
   }
 
   renderEditForm(postData) {
+    console.log('[VIEW] Rendering edit form');
     this.editFormContainer.innerHTML = `
       <form id="edit-post-form" class="post-form">
         <div class="form-group">
@@ -222,6 +266,8 @@ class BlogView {
   handleEditSubmit(e) {
     e.preventDefault();
 
+    console.log('[VIEW] handleEditSubmit triggered');
+
     this.clearEditFormErrors();
 
     const title = document.getElementById('edit-title').value.trim();
@@ -231,9 +277,12 @@ class BlogView {
     const errors = this.validateForm(postData);
 
     if (errors.length > 0) {
+      console.log('[VIEW] Edit form validation errors:', errors);
       this.displayEditFormErrors(errors);
       return;
     }
+
+    console.log('[VIEW] Edit form validated, notifying update for ID:', this.currentEditId);
 
     this.notifyObservers('onPostUpdate', {
       id: this.currentEditId,
@@ -258,7 +307,7 @@ class BlogView {
 
   cancelEdit() {
     this.currentEditId = null;
-    // this.renderPostForm(); // هنوز پیاده‌سازی نشده
+    this.renderPostForm(); // برگرداندن به حالت create
   }
 
   validateForm(postData) {
