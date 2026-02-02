@@ -8,8 +8,9 @@ class BlogView {
     this.observers = [];
     this.editModal = null;
     this.editFormContainer = null;
+    this.postsListener = null; // برای جلوگیری از چند listener
 
-    // Bind methods to maintain context
+    // Bind methods
     this.renderPosts = this.renderPosts.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
@@ -86,7 +87,7 @@ class BlogView {
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Create Post</button>
+          <button type="submit" class="btn btn-primary">${this.currentEditId ? 'Save Changes' : 'Create Post'}</button>
           ${this.currentEditId ? '<button type="button" id="cancel-edit" class="btn btn-cancel">Cancel Edit</button>' : ''}
         </div>
       </form>
@@ -154,11 +155,16 @@ class BlogView {
   }
 
   attachPostEventListeners() {
-    this.postsContainer.addEventListener('click', (e) => {
+    // جلوگیری از attach چندگانه
+    if (this.postsListener) {
+      this.postsContainer.removeEventListener('click', this.postsListener);
+    }
+
+    this.postsListener = (e) => {
       const action = e.target.closest('[data-action]');
       if (!action) return;
 
-      e.stopPropagation(); // جلوگیری از bubbling و trigger چندباره
+      e.stopPropagation(); // جلوگیری از bubbling
 
       const postId = Number(action.dataset.postId);
 
@@ -169,7 +175,9 @@ class BlogView {
       if (action.dataset.action === 'delete') {
         this.handleDelete(postId);
       }
-    });
+    };
+
+    this.postsContainer.addEventListener('click', this.postsListener);
   }
 
   attachFormEventListeners() {
@@ -228,8 +236,7 @@ class BlogView {
 
   handleDelete(postId) {
     console.log('[VIEW] handleDelete called for post ID:', postId);
-    const confirmed = confirm('Are you sure you want to delete this post?');
-    if (confirmed) {
+    if (confirm('Are you sure you want to delete this post?')) {
       this.notifyObservers('onPostDelete', postId);
     }
   }
@@ -245,7 +252,6 @@ class BlogView {
     console.log('[VIEW] Hiding edit modal');
     this.editModal.style.display = 'none';
     this.currentEditId = null;
-    this.renderPostForm(); // برگشت به فرم ایجاد
   }
 
   renderEditForm(postData) {
@@ -312,7 +318,7 @@ class BlogView {
       const el = document.getElementById(`edit-${error.field}-error`);
       if (el) {
         el.textContent = error.message;
-        el.style.display = 'block'; // فقط وقتی متن داره نمایش بده
+        el.style.display = 'block';
       }
     });
   }
@@ -322,7 +328,7 @@ class BlogView {
       .querySelectorAll('#edit-form-container .error-message')
       .forEach((el) => {
         el.textContent = '';
-        el.style.display = 'none'; // پنهان کردن وقتی خالی
+        el.style.display = 'none';
       });
   }
 
@@ -388,7 +394,7 @@ class BlogView {
   }
 
   showSuccess(message) {
-    console.log('[VIEW] Showing success message:', message); // برای دیباگ
+    console.log('[VIEW] Showing success message:', message);
 
     const successDiv = document.createElement('div');
     successDiv.className = 'success-message';
