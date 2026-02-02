@@ -11,21 +11,21 @@ class BlogView {
 
     // Bind methods to maintain context
     this.renderPosts = this.renderPosts.bind(this);
-    this.renderPostForm = this.renderPostForm.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
-    this.showLoading = this.showLoading.bind(this);
-    this.hideLoading = this.hideLoading.bind(this);
-    this.showError = this.showError.bind(this);
-    this.hideError = this.hideError.bind(this);
     this.showEditModal = this.showEditModal.bind(this);
     this.hideEditModal = this.hideEditModal.bind(this);
     this.renderEditForm = this.renderEditForm.bind(this);
     this.handleEditSubmit = this.handleEditSubmit.bind(this);
+    this.showLoading = this.showLoading.bind(this);
+    this.hideLoading = this.hideLoading.bind(this);
+    this.showError = this.showError.bind(this);
+    this.hideError = this.hideError.bind(this);
+
+    // renderPostForm هنوز پیاده‌سازی نشده، پس bind نمی‌کنیم
   }
 
-  // Observer pattern implementation
   addObserver(observer) {
     this.observers.push(observer);
   }
@@ -42,10 +42,9 @@ class BlogView {
     });
   }
 
-  // Initialization
   initialize() {
     this.setupDOMElements();
-    this.renderPostForm();
+    // this.renderPostForm();  // هنوز پیاده نشده
     this.notifyObservers('onViewInitialized');
   }
 
@@ -69,7 +68,6 @@ class BlogView {
     }
   }
 
-  // Rendering methods
   renderPosts(posts) {
     if (!posts || posts.length === 0) {
       this.postsContainer.innerHTML = `
@@ -90,6 +88,7 @@ class BlogView {
 
   renderPostCard(post) {
     const formattedDate = this.formatDate(post.createdAt);
+    const isUpdated = post.updatedAt !== post.createdAt;
 
     return `
       <article class="post-card" data-post-id="${post.id}">
@@ -97,6 +96,7 @@ class BlogView {
           <h2 class="post-title">${this.escapeHtml(post.title)}</h2>
           <div class="post-meta">
             <span class="post-date">${formattedDate}</span>
+            ${isUpdated ? '<span class="post-updated">Updated</span>' : ''}
           </div>
         </div>
         <div class="post-content">
@@ -114,7 +114,6 @@ class BlogView {
     `;
   }
 
-  // Event handling
   attachPostEventListeners() {
     this.postsContainer.addEventListener('click', (e) => {
       const action = e.target.closest('[data-action]');
@@ -183,7 +182,6 @@ class BlogView {
     }
   }
 
-  // Edit modal
   showEditModal(postData) {
     this.currentEditId = postData.id;
     this.renderEditForm(postData);
@@ -227,7 +225,6 @@ class BlogView {
   handleEditSubmit(e) {
     e.preventDefault();
 
-
     this.clearEditFormErrors();
 
     const title = document.getElementById('edit-title').value.trim();
@@ -262,10 +259,9 @@ class BlogView {
       .forEach((el) => (el.textContent = ''));
   }
 
-  // Utilities
   cancelEdit() {
     this.currentEditId = null;
-    this.renderPostForm();
+    // this.renderPostForm(); // فعلاً پیاده نشده
   }
 
   validateForm(postData) {
@@ -327,7 +323,14 @@ class BlogView {
   }
 
   formatDate(dateString) {
-    return new Date(dateString).toLocaleString();
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
   escapeHtml(text) {
@@ -337,5 +340,4 @@ class BlogView {
   }
 }
 
-window.viewExplanation = viewExplanation;
 window.BlogView = BlogView;

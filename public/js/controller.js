@@ -203,5 +203,5 @@ class BlogController {
   }
 }
 
-window.controllerExplanation = controllerExplanation;
+//window.controllerExplanation = controllerExplanation;
 window.BlogController = BlogController;
