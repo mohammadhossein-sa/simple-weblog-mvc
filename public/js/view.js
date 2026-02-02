@@ -227,6 +227,9 @@ class BlogView {
   handleEditSubmit(e) {
     e.preventDefault();
 
+
+    this.clearEditFormErrors();
+
     const title = document.getElementById('edit-title').value.trim();
     const content = document.getElementById('edit-content').value.trim();
 
@@ -251,6 +254,12 @@ class BlogView {
       const el = document.getElementById(`edit-${error.field}-error`);
       if (el) el.textContent = error.message;
     });
+  }
+
+  clearEditFormErrors() {
+    document
+      .querySelectorAll('#edit-form-container .error-message')
+      .forEach((el) => (el.textContent = ''));
   }
 
   // Utilities
@@ -302,7 +311,6 @@ class BlogView {
     this.errorContainer.style.display = 'none';
   }
 
-  
   showSuccess(message) {
     const successDiv = document.createElement('div');
     successDiv.className = 'success-message';
