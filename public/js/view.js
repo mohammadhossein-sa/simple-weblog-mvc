@@ -27,6 +27,12 @@ class BlogView {
     this.clearForm = this.clearForm.bind(this);
   }
 
+  // متد جدید برای آدرس داینامیک API (برای deploy روی هاست)
+  getApiBaseUrl() {
+    const origin = window.location.origin;
+    return `${origin}/api/posts`;
+  }
+
   addObserver(observer) {
     this.observers.push(observer);
   }
@@ -71,7 +77,6 @@ class BlogView {
 
   renderPostForm() {
     console.log('[VIEW] Rendering create post form');
-
     this.formContainer.innerHTML = `
       <form id="post-form" class="post-form">
         <div class="form-group">
@@ -79,26 +84,22 @@ class BlogView {
           <input type="text" id="title" name="title" placeholder="Enter post title" required />
           <div id="title-error" class="error-message"></div>
         </div>
-
         <div class="form-group">
           <label for="content">Content</label>
           <textarea id="content" name="content" rows="6" placeholder="Write your post here..." required></textarea>
           <div id="content-error" class="error-message"></div>
         </div>
-
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">${this.currentEditId ? 'Save Changes' : 'Create Post'}</button>
           ${this.currentEditId ? '<button type="button" id="cancel-edit" class="btn btn-cancel">Cancel Edit</button>' : ''}
         </div>
       </form>
     `;
-
     this.attachFormEventListeners();
   }
 
   clearForm() {
     console.log('[VIEW] Clearing form');
-
     const form = document.getElementById('post-form');
     if (form) {
       form.reset();
@@ -122,7 +123,6 @@ class BlogView {
     this.postsContainer.innerHTML = posts
       .map((post) => this.renderPostCard(post))
       .join('');
-
     this.attachPostEventListeners();
   }
 
@@ -155,24 +155,26 @@ class BlogView {
   }
 
   attachPostEventListeners() {
-    // جلوگیری از attach چندگانه
     if (this.postsListener) {
       this.postsContainer.removeEventListener('click', this.postsListener);
     }
 
     this.postsListener = (e) => {
-      const action = e.target.closest('[data-action]');
-      if (!action) return;
+      const actionBtn = e.target.closest('[data-action]');
+      if (!actionBtn) return;
 
-      e.stopPropagation(); // جلوگیری از bubbling
+      e.stopPropagation();
 
-      const postId = Number(action.dataset.postId);
+      const postId = Number(actionBtn.dataset.postId);
+      const action = actionBtn.dataset.action;
 
-      if (action.dataset.action === 'edit') {
+      console.log('[VIEW] Post action clicked:', action, 'ID:', postId);
+
+      if (action === 'edit') {
         this.handleEdit(postId);
       }
 
-      if (action.dataset.action === 'delete') {
+      if (action === 'delete') {
         this.handleDelete(postId);
       }
     };
@@ -195,7 +197,6 @@ class BlogView {
 
   handleSubmit(e) {
     e.preventDefault();
-
     console.log('[VIEW] handleSubmit triggered');
 
     const formData = new FormData(e.target);
@@ -245,13 +246,15 @@ class BlogView {
     console.log('[VIEW] Showing edit modal for post:', postData);
     this.currentEditId = postData.id;
     this.renderEditForm(postData);
-    this.editModal.style.display = 'block';
+    this.editModal.style.display = 'flex'; // flex برای وسط‌چین شدن
+    document.body.style.overflow = 'hidden'; // جلوگیری از اسکرول صفحه اصلی
   }
 
   hideEditModal() {
     console.log('[VIEW] Hiding edit modal');
     this.editModal.style.display = 'none';
     this.currentEditId = null;
+    document.body.style.overflow = ''; // برگرداندن اسکرول
   }
 
   renderEditForm(postData) {
@@ -275,18 +278,26 @@ class BlogView {
       </form>
     `;
 
-    document
-      .getElementById('edit-post-form')
-      .addEventListener('submit', this.handleEditSubmit);
+    const editForm = document.getElementById('edit-post-form');
+    if (editForm) {
+      editForm.addEventListener('submit', this.handleEditSubmit);
+    }
 
-    document
-      .getElementById('close-edit-modal')
-      .addEventListener('click', this.hideEditModal);
+    const closeBtn = document.getElementById('close-edit-modal');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => this.hideEditModal());
+    }
+
+    // کلیک خارج modal برای بستن
+    this.editModal.addEventListener('click', (e) => {
+      if (e.target === this.editModal) {
+        this.hideEditModal();
+      }
+    });
   }
 
   handleEditSubmit(e) {
     e.preventDefault();
-
     console.log('[VIEW] handleEditSubmit triggered');
 
     this.clearEditFormErrors();
@@ -407,7 +418,7 @@ class BlogView {
 
     setTimeout(() => {
       successDiv.remove();
-    }, 10000); // طولانی‌تر برای تست
+    }, 5000); // 5 ثانیه برای خوانایی بهتر
   }
 
   formatDate(dateString) {
