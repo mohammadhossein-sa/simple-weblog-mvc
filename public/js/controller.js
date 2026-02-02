@@ -81,18 +81,17 @@ class BlogController {
     }
   }
 
-  async handlePostCreate(postData) {
-    try {
-      console.log('Creating new post:', postData);
-      await this.model.createPost(postData);
-      this.view.showSuccess('Post created successfully!');
-    } catch (error) {
-      console.error('Failed to create post:', error);
-      this.view.showError(
-        'Failed to create post. Please try again.'
-      );
-    }
+async handlePostCreate(postData) {
+  try {
+    console.log('[CONTROLLER] handlePostCreate called with data:', postData);
+    await this.model.createPost(postData);
+    console.log('[CONTROLLER] createPost completed successfully');
+    this.view.showSuccess('Post created successfully!');
+  } catch (error) {
+    console.error('[CONTROLLER] handlePostCreate failed:', error.message);
+    this.view.showError('Failed to create post. Please try again.');
   }
+}
 
   async handlePostUpdate(updateData) {
     try {
