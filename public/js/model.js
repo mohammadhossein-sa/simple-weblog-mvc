@@ -113,7 +113,13 @@ class BlogModel {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const updatedPost = await response.json();
+      // چون سرور پست کامل برنمی‌گردونه، از داده‌های ورودی استفاده کن و updatedAt رو آپدیت کن
+      const updatedPost = {
+        ...this.getPostById(postId),  // پست فعلی رو بگیر
+        ...postData,  // فیلدهای جدید رو overwrite کن
+        updatedAt: new Date().toISOString()  // شبیه‌سازی updatedAt
+      };
+
       this.posts = this.posts.map(post =>
         post.id === postId ? updatedPost : post
       );
