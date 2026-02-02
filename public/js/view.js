@@ -23,7 +23,7 @@ class BlogView {
     this.showError = this.showError.bind(this);
     this.hideError = this.hideError.bind(this);
     this.renderPostForm = this.renderPostForm.bind(this);
-    this.clearForm = this.clearForm.bind(this); // اضافه شد
+    this.clearForm = this.clearForm.bind(this);
   }
 
   addObserver(observer) {
@@ -44,7 +44,7 @@ class BlogView {
 
   initialize() {
     this.setupDOMElements();
-    this.renderPostForm(); // نمایش فرم create در ابتدا
+    this.renderPostForm();
     this.notifyObservers('onViewInitialized');
   }
 
@@ -68,7 +68,6 @@ class BlogView {
     }
   }
 
-  // فرم ایجاد پست جدید
   renderPostForm() {
     console.log('[VIEW] Rendering create post form');
 
@@ -96,16 +95,16 @@ class BlogView {
     this.attachFormEventListeners();
   }
 
-  // پاک کردن و ریست فرم بعد از ایجاد/ویرایش
   clearForm() {
     console.log('[VIEW] Clearing form');
+
     const form = document.getElementById('post-form');
     if (form) {
       form.reset();
     }
     this.currentEditId = null;
     this.clearFormErrors();
-    this.renderPostForm(); // برگشت به حالت ایجاد پست
+    this.renderPostForm();
   }
 
   renderPosts(posts) {
@@ -158,6 +157,8 @@ class BlogView {
     this.postsContainer.addEventListener('click', (e) => {
       const action = e.target.closest('[data-action]');
       if (!action) return;
+
+      e.stopPropagation(); // جلوگیری از bubbling و trigger چندباره
 
       const postId = Number(action.dataset.postId);
 
@@ -244,7 +245,7 @@ class BlogView {
     console.log('[VIEW] Hiding edit modal');
     this.editModal.style.display = 'none';
     this.currentEditId = null;
-    this.renderPostForm(); // برگشت به فرم ایجاد بعد از بستن ویرایش
+    this.renderPostForm(); // برگشت به فرم ایجاد
   }
 
   renderEditForm(postData) {
@@ -309,19 +310,25 @@ class BlogView {
   displayEditFormErrors(errors) {
     errors.forEach((error) => {
       const el = document.getElementById(`edit-${error.field}-error`);
-      if (el) el.textContent = error.message;
+      if (el) {
+        el.textContent = error.message;
+        el.style.display = 'block'; // فقط وقتی متن داره نمایش بده
+      }
     });
   }
 
   clearEditFormErrors() {
     document
       .querySelectorAll('#edit-form-container .error-message')
-      .forEach((el) => (el.textContent = ''));
+      .forEach((el) => {
+        el.textContent = '';
+        el.style.display = 'none'; // پنهان کردن وقتی خالی
+      });
   }
 
   cancelEdit() {
     this.currentEditId = null;
-    this.renderPostForm(); // برگرداندن به حالت create
+    this.renderPostForm();
   }
 
   validateForm(postData) {
@@ -341,12 +348,18 @@ class BlogView {
   displayFormErrors(errors) {
     errors.forEach((error) => {
       const el = document.getElementById(`${error.field}-error`);
-      if (el) el.textContent = error.message;
+      if (el) {
+        el.textContent = error.message;
+        el.style.display = 'block';
+      }
     });
   }
 
   clearFormErrors() {
-    document.querySelectorAll('.error-message').forEach((el) => (el.textContent = ''));
+    document.querySelectorAll('.error-message').forEach((el) => {
+      el.textContent = '';
+      el.style.display = 'none';
+    });
   }
 
   showLoading() {
@@ -371,10 +384,12 @@ class BlogView {
 
   hideError() {
     this.errorContainer.style.display = 'none';
-    this.errorContainer.innerHTML = ''; // پاک کردن محتوای قبلی
+    this.errorContainer.innerHTML = '';
   }
 
   showSuccess(message) {
+    console.log('[VIEW] Showing success message:', message); // برای دیباگ
+
     const successDiv = document.createElement('div');
     successDiv.className = 'success-message';
     successDiv.innerHTML = `
@@ -386,7 +401,7 @@ class BlogView {
 
     setTimeout(() => {
       successDiv.remove();
-    }, 3000);
+    }, 10000); // طولانی‌تر برای تست
   }
 
   formatDate(dateString) {
