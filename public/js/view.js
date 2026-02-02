@@ -9,7 +9,7 @@ class BlogView {
     this.editModal = null;
     this.editFormContainer = null;
 
-    // Bind methods to maintain context (فقط متدهای موجود)
+    // Bind methods to maintain context
     this.renderPosts = this.renderPosts.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
@@ -22,7 +22,8 @@ class BlogView {
     this.hideLoading = this.hideLoading.bind(this);
     this.showError = this.showError.bind(this);
     this.hideError = this.hideError.bind(this);
-    this.renderPostForm = this.renderPostForm.bind(this); // اضافه شد
+    this.renderPostForm = this.renderPostForm.bind(this);
+    this.clearForm = this.clearForm.bind(this); // اضافه شد
   }
 
   addObserver(observer) {
@@ -43,7 +44,7 @@ class BlogView {
 
   initialize() {
     this.setupDOMElements();
-    this.renderPostForm();          // حالا فرم نمایش داده می‌شود
+    this.renderPostForm(); // نمایش فرم create در ابتدا
     this.notifyObservers('onViewInitialized');
   }
 
@@ -67,7 +68,7 @@ class BlogView {
     }
   }
 
-  // فرم ایجاد پست جدید (این متد نبود و مشکل اصلی بود)
+  // فرم ایجاد پست جدید
   renderPostForm() {
     console.log('[VIEW] Rendering create post form');
 
@@ -93,6 +94,18 @@ class BlogView {
     `;
 
     this.attachFormEventListeners();
+  }
+
+  // پاک کردن و ریست فرم بعد از ایجاد/ویرایش
+  clearForm() {
+    console.log('[VIEW] Clearing form');
+    const form = document.getElementById('post-form');
+    if (form) {
+      form.reset();
+    }
+    this.currentEditId = null;
+    this.clearFormErrors();
+    this.renderPostForm(); // برگشت به حالت ایجاد پست
   }
 
   renderPosts(posts) {
@@ -231,6 +244,7 @@ class BlogView {
     console.log('[VIEW] Hiding edit modal');
     this.editModal.style.display = 'none';
     this.currentEditId = null;
+    this.renderPostForm(); // برگشت به فرم ایجاد بعد از بستن ویرایش
   }
 
   renderEditForm(postData) {
