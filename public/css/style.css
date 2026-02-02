@@ -133,6 +133,13 @@ body {
   margin: 0 auto;
 }
 
+.post-form h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -163,11 +170,16 @@ body {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+.form-group input.error,
+.form-group textarea.error {
+  border-color: var(--error-color);
+}
+
 .form-group .error-message {
   color: var(--error-color);
   font-size: 0.875rem;
   margin-top: 0.25rem;
-  display: block;
+  display: none; /* پیش‌فرض پنهان */
 }
 
 .form-actions {
@@ -418,6 +430,7 @@ body {
   box-shadow: var(--shadow-lg);
   z-index: 1000;
   animation: slideIn 0.3s ease-out;
+  min-width: 250px;
 }
 
 @keyframes slideIn {
