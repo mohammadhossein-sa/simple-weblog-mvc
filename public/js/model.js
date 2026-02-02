@@ -63,48 +63,36 @@ class BlogModel {
     return errors;
   }
 
- async createPost(postData) {
-  this.setLoading(true);
+  async createPost(postData) {
+    this.setLoading(true);
 
-  try {
-    console.log('[MODEL] createPost started with data:', postData);
+    try {
+      const validationErrors = this.validatePostData(postData);
+      if (validationErrors.length > 0) {
+        throw new Error(validationErrors.join('. '));
+      }
 
-    const validationErrors = this.validatePostData(postData);
-    if (validationErrors.length > 0) {
-      console.log('[MODEL] Validation failed:', validationErrors);
-      throw new Error(validationErrors.join('. '));
+      const response = await fetch(this.apiBaseUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const newPost = await response.json();
+      this.posts.unshift(newPost);
+      this.notifyObservers('onPostCreated', newPost);
+      return newPost;
+    } catch (error) {
+      this.notifyObservers('onError', error.message);
+      throw error;
+    } finally {
+      this.setLoading(false);
     }
-
-    console.log('[MODEL] Sending POST request to:', this.apiBaseUrl);
-
-    const response = await fetch(this.apiBaseUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(postData)
-    });
-
-    console.log('[MODEL] POST response status:', response.status);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[MODEL] POST failed - response body:', errorText);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const newPost = await response.json();
-    console.log('[MODEL] New post received from server:', newPost);
-
-    this.posts.unshift(newPost);
-    this.notifyObservers('onPostCreated', newPost);
-    return newPost;
-  } catch (error) {
-    console.error('[MODEL] createPost error:', error.message);
-    this.notifyObservers('onError', error.message);
-    throw error;
-  } finally {
-    this.setLoading(false);
   }
-}
 
   async updatePost(postId, postData) {
     this.setLoading(true);
@@ -125,11 +113,10 @@ class BlogModel {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // چون سرور پست کامل برنمی‌گردونه، از داده‌های ورودی استفاده کن و updatedAt رو آپدیت کن
       const updatedPost = {
-        ...this.getPostById(postId),  // پست فعلی رو بگیر
-        ...postData,  // فیلدهای جدید رو overwrite کن
-        updatedAt: new Date().toISOString()  // شبیه‌سازی updatedAt
+        ...this.getPostById(postId),
+        ...postData,
+        updatedAt: new Date().toISOString()
       };
 
       this.posts = this.posts.map(post =>
