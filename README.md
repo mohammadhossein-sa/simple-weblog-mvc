@@ -1,7 +1,9 @@
 # 🎓 Educational Blog - MVC + REST API Project
 
-**A Complete Educational Blog Application**  
-Built with **Pure Vanilla JavaScript** using **MVC Architecture**, designed to teach software engineering principles
+# Simple Weblog MVC
+
+A full-stack blog application built with **pure Vanilla JavaScript** and **MVC (Model-View-Controller)** architecture.  
+This project features a clean RESTful API, complete CRUD operations, responsive UI with modal editing, real-time feedback (success toasts, loading states, errors), and simple JSON-based persistence — all without any frameworks.
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/mohammadhossein-sa/simple-weblog-mvc.git)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=for-the-badge&logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
