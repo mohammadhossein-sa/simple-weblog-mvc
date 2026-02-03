@@ -1,6 +1,5 @@
-# 🎓 Educational Blog - MVC + REST API Project
+# 🎓 Simple Weblog MVC + REST API Project
 
-# Simple Weblog MVC
 
 A full-stack blog application built with **pure Vanilla JavaScript** and **MVC (Model-View-Controller)** architecture.  
 This project features a clean RESTful API, complete CRUD operations, responsive UI with modal editing, real-time feedback (success toasts, loading states, errors), and simple JSON-based persistence — all without any frameworks.
